@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+
+.dark {
+  /* Map violet accent colors to indigo colors matching the reference highlights */
+  --color-violet-400: #a5b4fc;
+  --color-violet-500: #818cf8;
+  --color-violet-600: #6366f1;
+  --color-violet-700: #4f46e5;
+
+  /* Navy-slate surface overrides — only remap specific surface shades
+     used for backgrounds and borders, NOT for text, so readability is preserved. */
+  --color-zinc-800: #1a2640;  /* border color */
+  --color-zinc-900: #111827;  /* card/secondary surface */
+  --color-zinc-950: #0d1526;  /* primary deep-navy background */
+}
+
+
+
+@utility font-sans {
+  font-family: var(--font-sans);
+}
+
+@utility font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Custom scrollbar styling for that IDE look */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Custom styling for focus ring to make it look professional */
+*:focus-visible {
+  outline: 2px solid rgb(124, 58, 237);
+  outline-offset: 2px;
+}
+
+/* Prevent layout shift during theme transition but respect prefers-reduced-motion */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  overflow: hidden; /* IDE layout manages its own scroll */
+  height: 100vh;
+  width: 100vw;
+}
