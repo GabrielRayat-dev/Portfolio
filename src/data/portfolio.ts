@@ -58,7 +58,7 @@ export const portfolioData: PortfolioData = {
       {
         degree: "Bachelor of Science in Computer Science",
         school: "Colegio de Los Baños",
-        years: "2024–2029",
+        years: "2024–present",
       },
       {
         degree: "High School Diploma",
