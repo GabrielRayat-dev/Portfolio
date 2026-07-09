@@ -24,12 +24,21 @@ export const ExperienceView: React.FC = () => {
         {"// Experience log - Timeline view"}
       </div>
 
-      <div className="relative border-l border-zinc-200 dark:border-zinc-800 ml-3 sm:ml-4 pl-6 sm:pl-8 space-y-6 sm:space-y-8 pb-4">
+      <div className="relative ml-3 sm:ml-4 pl-6 sm:pl-8 space-y-6 sm:space-y-8 pb-4">
         {experience.map((exp, idx) => {
           const isExpanded = !!expandedIndices[idx];
+          const isLast = idx === experience.length - 1;
 
           return (
             <div key={idx} className="relative group">
+              {/* Connector segment to next node (skipped for the last entry) */}
+              {!isLast && (
+                <div
+                  className="absolute -left-[29px] top-[30px] -bottom-[42px] sm:-bottom-[50px] w-px bg-zinc-200 dark:bg-zinc-800"
+                  aria-hidden="true"
+                />
+              )}
+
               {/* Hollow Dot Node */}
               <div
                 className={`absolute -left-[41px] top-1.5 w-6 h-6 rounded-full border-2 bg-white dark:bg-zinc-950 transition-colors flex items-center justify-center cursor-pointer ${
