@@ -21,7 +21,7 @@ const NAV_ITEMS = [
 export const MobileNav: React.FC<MobileNavProps> = ({ activeTabId, onTabSelect }) => {
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 flex items-stretch border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/95 dark:bg-zinc-950/95 backdrop-blur-sm select-none"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 flex items-stretch border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/95 dark:bg-zinc-950/95 backdrop-blur-sm select-none pb-[env(safe-area-inset-bottom)]"
       aria-label="Mobile navigation"
     >
       {NAV_ITEMS.map(({ id, label, icon: Icon, iconClass }) => {
