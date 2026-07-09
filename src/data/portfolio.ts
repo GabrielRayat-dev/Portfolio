@@ -50,7 +50,7 @@ export const portfolioData: PortfolioData = {
   about: {
     name: "Jan Gabriel V. Rayat",
     title: "CS student / aspiring web developer",
-    tagline: "Hi, I'm Gabriel — CS student",
+    tagline: "Jan Gabriel V. Rayat",
     bio: "I am a 3rd-year BS Computer Science student at Colegio de Los Baños, currently focused on building robust and modern web applications. Passionate about software engineering, frontend technologies, and creating interactive user experiences.",
     education: [
       {
