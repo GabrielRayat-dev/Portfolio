@@ -11,6 +11,7 @@ export interface ExperienceEntry {
   details: string[];
 }
 
+
 export interface Project {
   id: string;
   filename: string;
@@ -18,7 +19,9 @@ export interface Project {
   tagline: string;
   description: string;
   problemSolution: string;
+  myRole?: string;
   tech: string[];
+  status: "coming-soon" | "available";
   demoUrl: string;
   githubUrl: string;
 }
@@ -107,8 +110,9 @@ export const portfolioData: PortfolioData = {
       description: "A full-stack team collaboration platform built for student groups to manage projects, assign tasks, and track progress through a clean dashboard.",
       problemSolution: "Student teams struggle to track who is doing what, what is done, and what is blocked — all coordination happens in messy group chats. Progresso solves this with a clean dashboard where every task has a status, activity log, and comment thread so the whole team stays aligned without a single follow-up message.",
       tech: ["Node.js", "Express", "Supabase", "PostgreSQL", "JWT", "React", "Chart.js", "Vercel", "Render"],
-      demoUrl: "https://github.com/GabrielRayat-dev",
-      githubUrl: "https://github.com/GabrielRayat-dev",
+      status: "coming-soon",
+      demoUrl: "",
+      githubUrl: "",
     },
     {
       id: "project-two",
@@ -117,9 +121,11 @@ export const portfolioData: PortfolioData = {
       tagline: "A backend system for managing clinic appointments, patient records, staff accounts, and audit logging.",
       description: "A structured REST API backend for a dental clinic handling appointments, patient diagnosis records with image uploads, role-based staff access, and a full audit trail of all clinic actions.",
       problemSolution: "Managing a dental clinic manually leads to disorganized patient records, untracked staff actions, and insecure account management. This backend system replaces that with a structured REST API handling appointments, patient diagnosis records with image uploads, role-based staff access, and a full audit trail of all clinic actions.",
+      myRole: "Full-stack team project — I built and own the backend (REST API, database schema, authentication, role-based access, and audit logging). Frontend built by a teammate.",
       tech: ["Node.js", "Express", "Supabase", "PostgreSQL", "Supabase Auth", "Supabase Storage", "Brevo"],
-      demoUrl: "https://github.com/GabrielRayat-dev",
-      githubUrl: "https://github.com/GabrielRayat-dev",
+      status: "available",
+      demoUrl: "",
+      githubUrl: "https://github.com/GabrielRayat-dev/stellars-dental-clinic",
     },
   ],
   skills: {
