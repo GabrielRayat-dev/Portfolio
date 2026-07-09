@@ -1,5 +1,5 @@
 import React from 'react';
-import { TbSchool, TbBook } from 'react-icons/tb';
+import { TbSchool, TbBook, TbRosetteDiscountCheckFilled, TbMapPin } from 'react-icons/tb';
 import { portfolioData } from '../../data/portfolio';
 import profileImg from '../../assets/pr1.png';
 
@@ -16,9 +16,14 @@ export const AboutView: React.FC = () => {
           className="w-20 h-20 rounded-full object-cover shadow-sm border border-violet-500 shrink-0"
         />
         <div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-zinc-50 leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-zinc-50 leading-tight flex items-center gap-2">
             {about.tagline}
+            <TbRosetteDiscountCheckFilled size={26} className="text-violet-500 shrink-0" />
           </h1>
+          <p className="flex items-center justify-center sm:justify-start gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 mt-1.5">
+            <TbMapPin size={16} className="shrink-0" />
+            {about.location}
+          </p>
           <p className="text-base sm:text-lg text-zinc-500 dark:text-zinc-400 font-mono mt-1">
             {about.title}
           </p>
