@@ -13,7 +13,7 @@ export const AboutView: React.FC = () => {
         <img
           src={profileImg}
           alt={about.name}
-          className="w-20 h-20 rounded-full object-cover shadow-sm border border-violet-500 shrink-0"
+          className="w-20 h-20 md:w-30 md:h-30 rounded-full object-cover shadow-sm border border-violet-500 shrink-0"
         />
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-zinc-50 leading-tight flex items-center gap-2">
