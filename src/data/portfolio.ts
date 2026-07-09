@@ -74,7 +74,7 @@ export const portfolioData: PortfolioData = {
     {
       title: "Game Support Representative",
       company: "Qroad Philippines Inc.",
-      period: "2021–2024",
+      period: "2022–2024",
       details: [
         "Communicated with players to understand their needs and demands",
         "Answered customer support tickets, emails, and user reviews professionally and promptly",
@@ -84,7 +84,7 @@ export const portfolioData: PortfolioData = {
     {
       title: "Production Operator",
       company: "DENSO Philippines Corporation",
-      period: "2019–2021",
+      period: "2020–2022",
       details: [
         "Assembled and tested automotive electronic components on the production line",
         "Operated and monitored automated machines and testing equipment",
