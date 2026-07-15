@@ -1,148 +1,34 @@
 import React, { useState } from 'react';
 import { TbGitBranch, TbGitCommit, TbPlus, TbChevronRight, TbFile, TbCheck, TbX, TbClock, TbUser, TbCopy } from 'react-icons/tb';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface GitCommit {
-  hash: string;
-  fullHash: string;
-  message: string;
-  author: string;
-  date: string;
-  time: string;
-  files: string[];
-  staged?: boolean;
-}
+import type { GitCommit } from '../data/gitHistory';
 
 interface GitPanelProps {
   isOpen: boolean;
   onClose: () => void;
   onToggleFileExplorer: () => void;
   onViewHistory: () => void;
+  commits: GitCommit[];
+  stagedChanges: GitCommit[];
+  hasCommitted: boolean;
+  onCommitStaged: () => void;
 }
-
-const MOCK_COMMITS: GitCommit[] = [
-  {
-    hash: 'a1b2c3d',
-    fullHash: 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345ab6',
-    message: 'feat: Add real-time typing animation for code files',
-    author: 'Gabriel Rayat',
-    date: '2024-01-15',
-    time: '14:32:07',
-    files: ['modified: src/components/EditorPane.tsx', 'modified: src/hooks/useTypingEffect.ts'],
-    staged: false,
-  },
-  {
-    hash: 'e4f5g6h',
-    fullHash: 'e4f5g6h7i8j92030a4b5c6d7e8f9a0b1c2d3e4f',
-    message: 'fix: Resolve sidebar toggle on mobile breakpoint',
-    author: 'Gabriel Rayat',
-    date: '2024-01-14',
-    time: '09:18:44',
-    files: ['modified: src/components/Sidebar.tsx', 'modified: src/App.tsx'],
-    staged: false,
-  },
-  {
-    hash: 'i7j8k9l',
-    fullHash: 'i7j8k9l0m1n20304b5c6d7e8f9a0b1c2d3e4f5a',
-    message: 'chore: Update dependencies and Tailwind config',
-    author: 'Gabriel Rayat',
-    date: '2024-01-13',
-    time: '18:05:12',
-    files: ['modified: package.json', 'modified: tailwind.config.js', 'modified: vite.config.ts'],
-    staged: false,
-  },
-  {
-    hash: 'm0n1o2p',
-    fullHash: 'm0n1o2p3q4r20506c6d7e8f9a0b1c2d3e4f5a6b',
-    message: 'feat: Implement VS Code-style command palette (Ctrl+P)',
-    author: 'Gabriel Rayat',
-    date: '2024-01-12',
-    time: '11:47:53',
-    files: ['modified: src/components/CommandPalette.tsx', 'modified: src/App.tsx'],
-    staged: false,
-  },
-  {
-    hash: 'q3r4s5t',
-    fullHash: 'q3r4s5t6u7v20808d7e8f9a0b1c2d3e4f5a6b7c',
-    message: 'Initial commit - Portfolio v3 structure',
-    author: 'Gabriel Rayat',
-    date: '2024-01-10',
-    time: '20:14:39',
-    files: ['added: src/', 'added: public/', 'added: index.html', 'added: package.json'],
-    staged: false,
-  },
-];
-
-const STAGED_CHANGES: GitCommit[] = [
-  {
-    hash: 'uncommitted',
-    fullHash: 'uncommitted',
-    message: 'work in progress: Add breadcrumb navigation highlight',
-    author: 'You',
-    date: 'Just now',
-    time: '—',
-    files: ['modified: src/components/Breadcrumbs.tsx', 'added: src/hooks/useScrollSpy.ts'],
-    staged: true,
-  },
-  {
-    hash: 'uncommitted',
-    fullHash: 'uncommitted',
-    message: 'work in progress: Dark mode theme refinements',
-    author: 'You',
-    date: 'Just now',
-    time: '—',
-    files: ['modified: src/index.css', 'modified: src/components/TopBar.tsx'],
-    staged: true,
-  },
-];
-
-// Generate a random hex-ish string of given length (e.g. 'g2f8h3k')
-const generateHash = (length: number): string => {
-  const chars = 'abcdef0123456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
-};
 
 export const GitPanel: React.FC<GitPanelProps> = ({
   isOpen,
   onClose,
   onToggleFileExplorer,
   onViewHistory,
+  commits,
+  stagedChanges,
+  hasCommitted,
+  onCommitStaged,
 }) => {
   const [expandedCommit, setExpandedCommit] = useState<string | null>(null);
   const [showStaged, setShowStaged] = useState(true);
   const [showHistory, setShowHistory] = useState(true);
 
-  // Mutable commit state (so we can prepend a new commit on "Commit")
-  const [commits, setCommits] = useState<GitCommit[]>(MOCK_COMMITS);
-  const [stagedChanges, setStagedChanges] = useState<GitCommit[]>(STAGED_CHANGES);
-  const [hasCommitted, setHasCommitted] = useState(false);
-
   if (!isOpen) return null;
-
-  const handleCommitStaged = () => {
-    if (hasCommitted || stagedChanges.length === 0) return;
-
-    const newCommit: GitCommit = {
-      hash: generateHash(7),
-      fullHash: generateHash(40),
-      message: 'feat: Add breadcrumb navigation highlight',
-      author: 'Guest Developer',
-      date: new Date().toISOString().slice(0, 10),
-      time: 'Just now',
-      files: ['modified: src/components/Breadcrumbs.tsx', 'added: src/hooks/useScrollSpy.ts'],
-      staged: false,
-    };
-
-    // 1. Staged items animate out (exit), 2. badge → 0
-    setStagedChanges([]);
-    // 3 & 4. Prepend new commit at top of history -> badge 5 → 6
-    setCommits((prev) => [newCommit, ...prev]);
-    setHasCommitted(true);
-  };
 
   return (
     <aside className="flex flex-col w-64 h-full border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 animate-slide-in">
@@ -287,7 +173,7 @@ export const GitPanel: React.FC<GitPanelProps> = ({
       {/* Footer Actions */}
       <div className="p-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 space-y-2">
         <button
-          onClick={handleCommitStaged}
+          onClick={onCommitStaged}
           disabled={hasCommitted}
           className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
             hasCommitted

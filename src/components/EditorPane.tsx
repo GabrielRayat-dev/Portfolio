@@ -10,6 +10,7 @@ import { ProjectDetailView } from './views/ProjectDetailView';
 import { SkillsView } from './views/SkillsView';
 import { ContactView } from './views/ContactView';
 import { GitHistoryView } from './views/GitHistoryView';
+import type { GitCommit } from '../data/gitHistory';
 import { portfolioData } from '../data/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -18,6 +19,7 @@ interface EditorPaneProps {
   activeTabId: string | null;
   onTabSelect: (tabId: string) => void;
   onTabClose: (tabId: string) => void;
+  gitCommits: GitCommit[];
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = ({
@@ -25,6 +27,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   activeTabId,
   onTabSelect,
   onTabClose,
+  gitCommits,
 }) => {
   const getTabMetadata = (tabId: string) => {
     switch (tabId) {
@@ -66,7 +69,7 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
       case 'contact.txt':
         return <ContactView />;
       case 'git-history.log':
-        return <GitHistoryView />;
+        return <GitHistoryView commits={gitCommits} />;
       default:
         return null;
     }

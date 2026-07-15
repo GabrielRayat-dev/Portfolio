@@ -1,24 +1,12 @@
 import React from 'react';
 import { TbTerminal2, TbGitCommit } from 'react-icons/tb';
+import type { GitCommit } from '../../data/gitHistory';
 
-interface GitHistoryNode {
-  hash: string;
-  message: string;
-  author: string;
-  date: string;
-  branch?: string;
+interface GitHistoryViewProps {
+  commits: GitCommit[];
 }
 
-// Mock git commit history tree (terminal `git log --graph --oneline` style)
-const GIT_HISTORY: GitHistoryNode[] = [
-  { hash: 'a1b2c3d', message: 'feat: Add real-time typing animation for code files', author: 'Gabriel Rayat', date: '2024-01-15', branch: 'HEAD -> main' },
-  { hash: 'e4f5g6h', message: 'fix: Resolve sidebar toggle on mobile breakpoint', author: 'Gabriel Rayat', date: '2024-01-14' },
-  { hash: 'i7j8k9l', message: 'chore: Update dependencies and Tailwind config', author: 'Gabriel Rayat', date: '2024-01-13' },
-  { hash: 'm0n1o2p', message: 'feat: Implement VS Code-style command palette (Ctrl+P)', author: 'Gabriel Rayat', date: '2024-01-12' },
-  { hash: 'q3r4s5t', message: 'Initial commit - Portfolio v3 structure', author: 'Gabriel Rayat', date: '2024-01-10' },
-];
-
-export const GitHistoryView: React.FC = () => {
+export const GitHistoryView: React.FC<GitHistoryViewProps> = ({ commits }) => {
   return (
     <div className="max-w-4xl mx-auto py-6 sm:py-8 px-4 sm:px-6 font-mono text-sm">
       {/* Terminal window */}
@@ -44,13 +32,14 @@ export const GitHistoryView: React.FC = () => {
 
           {/* Commit tree */}
           <div className="mt-4 space-y-0.5">
-            {GIT_HISTORY.map((node, idx) => {
-              const isLast = idx === GIT_HISTORY.length - 1;
+            {commits.map((node, idx) => {
+              const isLast = idx === commits.length - 1;
+              const isHead = idx === 0;
               // Build ASCII graph line: ● for node, │ connector down, ├─/└─ branch
               const connector = isLast ? '└─' : '├─';
-              const spine = isLast ? '  ' : '│ ';
+              const spine = isLast ? '  ' : '│ ';
               return (
-                <div key={node.hash} className="group">
+                <div key={node.fullHash} className="group">
                   <div className="flex items-start gap-2 hover:bg-zinc-100/70 dark:hover:bg-zinc-900/60 rounded px-1 -mx-1 transition-colors">
                     <span className="text-zinc-400 dark:text-zinc-600 select-none shrink-0 w-[2.5rem] text-right">
                       {connector}
@@ -64,9 +53,9 @@ export const GitHistoryView: React.FC = () => {
                     <span className="text-zinc-800 dark:text-zinc-200 flex-1 min-w-0">
                       {node.message}
                     </span>
-                    {node.branch && (
+                    {isHead && (
                       <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-sans font-medium bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
-                        {node.branch}
+                        HEAD -&gt; main
                       </span>
                     )}
                   </div>
@@ -97,7 +86,7 @@ export const GitHistoryView: React.FC = () => {
 
       {/* Footer hint */}
       <p className="mt-4 text-xs text-zinc-400 dark:text-zinc-500 text-center font-sans">
-        Showing {GIT_HISTORY.length} commits • Generated from local repository history
+        Showing {commits.length} commits • Synced with local repository history
       </p>
     </div>
   );

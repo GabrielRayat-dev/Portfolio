@@ -7,6 +7,8 @@ import { StatusBar } from './components/StatusBar';
 import { MobileNav } from './components/MobileNav';
 import { CommandPalette } from './components/CommandPalette';
 import { GitPanel } from './components/GitPanel';
+import { REAL_COMMITS, STAGED_CHANGES, generateHash, fullFromShort } from './data/gitHistory';
+import type { GitCommit } from './data/gitHistory';
 
 function App() {
   const { theme, toggleTheme } = useTheme();
@@ -20,6 +22,30 @@ function App() {
 
   // Command palette state
   const [paletteOpen, setPaletteOpen] = useState(false);
+
+  // Shared Git state — drives BOTH the Source Control sidebar and git-history.log
+  const [commits, setCommits] = useState<GitCommit[]>(REAL_COMMITS);
+  const [stagedChanges, setStagedChanges] = useState<GitCommit[]>(STAGED_CHANGES);
+  const [hasCommitted, setHasCommitted] = useState(false);
+
+  // Commit staged changes: clear staged list, prepend a new commit to shared history
+  const handleCommitStaged = useCallback(() => {
+    if (hasCommitted || stagedChanges.length === 0) return;
+    const newHash = generateHash(7);
+    const newCommit: GitCommit = {
+      hash: newHash,
+      fullHash: fullFromShort(newHash),
+      message: 'feat: Add breadcrumb navigation highlight',
+      author: 'Guest Developer',
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      time: 'Just now',
+      files: ['modified: src/components/Breadcrumbs.tsx', 'added: src/hooks/useScrollSpy.ts'],
+      staged: false,
+    };
+    setCommits((prev) => [newCommit, ...prev]);
+    setStagedChanges([]);
+    setHasCommitted(true);
+  }, [hasCommitted, stagedChanges.length]);
 
   // Tab states: default opens about.md
   const [openTabs, setOpenTabs] = useState<string[]>(['about.md']);
@@ -91,6 +117,10 @@ function App() {
             onClose={() => setSidebarView('explorer')}
             onToggleFileExplorer={() => setSidebarView('explorer')}
             onViewHistory={() => handleTabSelect('git-history.log')}
+            commits={commits}
+            stagedChanges={stagedChanges}
+            hasCommitted={hasCommitted}
+            onCommitStaged={handleCommitStaged}
           />
         )}
 
@@ -100,6 +130,7 @@ function App() {
             activeTabId={activeTabId}
             onTabSelect={handleTabSelect}
             onTabClose={handleTabClose}
+            gitCommits={commits}
           />
         </main>
       </div>
