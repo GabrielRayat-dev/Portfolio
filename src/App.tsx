@@ -7,7 +7,7 @@ import { StatusBar } from './components/StatusBar';
 import { MobileNav } from './components/MobileNav';
 import { CommandPalette } from './components/CommandPalette';
 import { GitPanel } from './components/GitPanel';
-import { REAL_COMMITS, STAGED_CHANGES, generateHash, fullFromShort } from './data/gitHistory';
+import { REAL_COMMITS, STAGED_CHANGES, fullFromShort } from './data/gitHistory';
 import type { GitCommit } from './data/gitHistory';
 
 function App() {
@@ -28,24 +28,32 @@ function App() {
   const [stagedChanges, setStagedChanges] = useState<GitCommit[]>(STAGED_CHANGES);
   const [hasCommitted, setHasCommitted] = useState(false);
 
-  // Commit staged changes: clear staged list, prepend a new commit to shared history
+  // Commit staged changes: clear staged list, prepend a new commit per staged change
   const handleCommitStaged = useCallback(() => {
     if (hasCommitted || stagedChanges.length === 0) return;
-    const newHash = generateHash(7);
-    const newCommit: GitCommit = {
-      hash: newHash,
-      fullHash: fullFromShort(newHash),
-      message: 'feat: Add breadcrumb navigation highlight',
+
+    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const makeCommit = (shortHash: string, message: string, files: string[]): GitCommit => ({
+      hash: shortHash,
+      fullHash: fullFromShort(shortHash),
+      message,
       author: 'Guest Developer',
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      date: today,
       time: 'Just now',
-      files: ['modified: src/components/Breadcrumbs.tsx', 'added: src/hooks/useScrollSpy.ts'],
+      files,
       staged: false,
-    };
-    setCommits((prev) => [newCommit, ...prev]);
+    });
+
+    // One new commit card for EACH staged change (both slide to the top of history)
+    const newCommits: GitCommit[] = [
+      makeCommit('a6f596b', 'feat: Add breadcrumb navigation highlight', stagedChanges[0]?.files ?? []),
+      makeCommit('d3e4f5g', 'feat: Dark mode theme refinements', stagedChanges[1]?.files ?? []),
+    ];
+
+    setCommits((prev) => [...newCommits, ...prev]); // newest first -> top of sidebar + git-history.log
     setStagedChanges([]);
     setHasCommitted(true);
-  }, [hasCommitted, stagedChanges.length]);
+  }, [hasCommitted, stagedChanges]);
 
   // Tab states: default opens about.md
   const [openTabs, setOpenTabs] = useState<string[]>(['about.md']);
