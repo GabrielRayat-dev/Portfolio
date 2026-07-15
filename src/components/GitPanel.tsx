@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { TbGitBranch, TbGitCommit, TbPlus, TbMinus, TbChevronRight, TbChevronDown, TbFile, TbCheck, TbX, TbClock, TbUser } from 'react-icons/tb';
+import { TbGitBranch, TbGitCommit, TbPlus, TbChevronRight, TbFile, TbCheck, TbX, TbClock, TbUser, TbCopy } from 'react-icons/tb';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface GitCommit {
   hash: string;
+  fullHash: string;
   message: string;
   author: string;
   date: string;
+  time: string;
   files: string[];
   staged?: boolean;
 }
@@ -15,85 +17,131 @@ interface GitPanelProps {
   isOpen: boolean;
   onClose: () => void;
   onToggleFileExplorer: () => void;
+  onViewHistory: () => void;
 }
 
 const MOCK_COMMITS: GitCommit[] = [
   {
     hash: 'a1b2c3d',
+    fullHash: 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345ab6',
     message: 'feat: Add real-time typing animation for code files',
     author: 'Gabriel Rayat',
     date: '2024-01-15',
-    files: ['src/components/EditorPane.tsx', 'src/hooks/useTypingEffect.ts'],
+    time: '14:32:07',
+    files: ['modified: src/components/EditorPane.tsx', 'modified: src/hooks/useTypingEffect.ts'],
     staged: false,
   },
   {
     hash: 'e4f5g6h',
+    fullHash: 'e4f5g6h7i8j92030a4b5c6d7e8f9a0b1c2d3e4f',
     message: 'fix: Resolve sidebar toggle on mobile breakpoint',
     author: 'Gabriel Rayat',
     date: '2024-01-14',
-    files: ['src/components/Sidebar.tsx', 'src/App.tsx'],
+    time: '09:18:44',
+    files: ['modified: src/components/Sidebar.tsx', 'modified: src/App.tsx'],
     staged: false,
   },
   {
     hash: 'i7j8k9l',
+    fullHash: 'i7j8k9l0m1n20304b5c6d7e8f9a0b1c2d3e4f5a',
     message: 'chore: Update dependencies and Tailwind config',
     author: 'Gabriel Rayat',
     date: '2024-01-13',
-    files: ['package.json', 'tailwind.config.js', 'vite.config.ts'],
+    time: '18:05:12',
+    files: ['modified: package.json', 'modified: tailwind.config.js', 'modified: vite.config.ts'],
     staged: false,
   },
   {
     hash: 'm0n1o2p',
+    fullHash: 'm0n1o2p3q4r20506c6d7e8f9a0b1c2d3e4f5a6b',
     message: 'feat: Implement VS Code-style command palette (Ctrl+P)',
     author: 'Gabriel Rayat',
     date: '2024-01-12',
-    files: ['src/components/CommandPalette.tsx', 'src/App.tsx'],
+    time: '11:47:53',
+    files: ['modified: src/components/CommandPalette.tsx', 'modified: src/App.tsx'],
     staged: false,
   },
   {
     hash: 'q3r4s5t',
+    fullHash: 'q3r4s5t6u7v20808d7e8f9a0b1c2d3e4f5a6b7c',
     message: 'Initial commit - Portfolio v3 structure',
     author: 'Gabriel Rayat',
     date: '2024-01-10',
-    files: ['src/', 'public/', 'index.html', 'package.json'],
+    time: '20:14:39',
+    files: ['added: src/', 'added: public/', 'added: index.html', 'added: package.json'],
     staged: false,
   },
 ];
 
 const STAGED_CHANGES: GitCommit[] = [
   {
-    hash: '',
+    hash: 'uncommitted',
+    fullHash: 'uncommitted',
     message: 'work in progress: Add breadcrumb navigation highlight',
     author: 'You',
     date: 'Just now',
-    files: ['src/components/Breadcrumbs.tsx', 'src/hooks/useScrollSpy.ts'],
+    time: '—',
+    files: ['modified: src/components/Breadcrumbs.tsx', 'added: src/hooks/useScrollSpy.ts'],
     staged: true,
   },
   {
-    hash: '',
+    hash: 'uncommitted',
+    fullHash: 'uncommitted',
     message: 'work in progress: Dark mode theme refinements',
     author: 'You',
     date: 'Just now',
-    files: ['src/index.css', 'src/components/TopBar.tsx'],
+    time: '—',
+    files: ['modified: src/index.css', 'modified: src/components/TopBar.tsx'],
     staged: true,
   },
 ];
+
+// Generate a random hex-ish string of given length (e.g. 'g2f8h3k')
+const generateHash = (length: number): string => {
+  const chars = 'abcdef0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+};
 
 export const GitPanel: React.FC<GitPanelProps> = ({
   isOpen,
   onClose,
   onToggleFileExplorer,
+  onViewHistory,
 }) => {
   const [expandedCommit, setExpandedCommit] = useState<string | null>(null);
   const [showStaged, setShowStaged] = useState(true);
   const [showHistory, setShowHistory] = useState(true);
 
+  // Mutable commit state (so we can prepend a new commit on "Commit")
+  const [commits, setCommits] = useState<GitCommit[]>(MOCK_COMMITS);
+  const [stagedChanges, setStagedChanges] = useState<GitCommit[]>(STAGED_CHANGES);
+  const [hasCommitted, setHasCommitted] = useState(false);
+
   if (!isOpen) return null;
 
-  const formatDate = (dateStr: string) => {
-    if (dateStr === 'Just now') return 'Just now';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const handleCommitStaged = () => {
+    if (hasCommitted || stagedChanges.length === 0) return;
+
+    const newCommit: GitCommit = {
+      hash: generateHash(7),
+      fullHash: generateHash(40),
+      message: 'feat: Add breadcrumb navigation highlight',
+      author: 'Guest Developer',
+      date: new Date().toISOString().slice(0, 10),
+      time: 'Just now',
+      files: ['modified: src/components/Breadcrumbs.tsx', 'added: src/hooks/useScrollSpy.ts'],
+      staged: false,
+    };
+
+    // 1. Staged items animate out (exit), 2. badge → 0
+    setStagedChanges([]);
+    // 3 & 4. Prepend new commit at top of history -> badge 5 → 6
+    setCommits((prev) => [newCommit, ...prev]);
+    setHasCommitted(true);
   };
 
   return (
@@ -136,7 +184,7 @@ export const GitPanel: React.FC<GitPanelProps> = ({
           }`}
         >
           <TbPlus size={12} />
-          <span>Staged ({STAGED_CHANGES.length})</span>
+          <span>Staged ({stagedChanges.length})</span>
         </button>
         <button
           onClick={() => setShowHistory(!showHistory)}
@@ -147,66 +195,81 @@ export const GitPanel: React.FC<GitPanelProps> = ({
           }`}
         >
           <TbGitCommit size={12} />
-          <span>History ({MOCK_COMMITS.length})</span>
+          <span>History ({commits.length})</span>
         </button>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-2">
         {/* Staged Changes */}
-        <AnimatePresence>
-          {showStaged && STAGED_CHANGES.length > 0 && (
+        <AnimatePresence initial={false}>
+          {showStaged && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-4"
+              className="mb-4 overflow-hidden"
             >
               <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                 <TbPlus size={12} className="text-green-500" />
                 Staged Changes
                 <span className="ml-auto px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded text-[10px]">
-                  {STAGED_CHANGES.length}
+                  {stagedChanges.length}
                 </span>
               </div>
-              <div className="space-y-1">
-                {STAGED_CHANGES.map((commit, index) => (
-                  <StagedChangeItem
-                    key={index}
-                    commit={commit}
-                    index={index}
-                  />
-                ))}
+
+              {/* Items animate out individually via AnimatePresence */}
+              <div className="space-y-1 mt-1">
+                <AnimatePresence initial={false}>
+                  {stagedChanges.map((commit, index) => (
+                    <StagedChangeItem
+                      key={`${commit.message}-${index}`}
+                      commit={commit}
+                    />
+                  ))}
+                </AnimatePresence>
+
+                {stagedChanges.length === 0 && (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="px-2 py-3 text-xs text-zinc-400 dark:text-zinc-500 italic"
+                  >
+                    Nothing staged
+                  </motion.p>
+                )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Commit History */}
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {showHistory && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
             >
               <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                 <TbGitCommit size={12} className="text-violet-600 dark:text-violet-400" />
                 Commit History
                 <span className="ml-auto px-1.5 py-0.5 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 rounded text-[10px]">
-                  {MOCK_COMMITS.length}
+                  {commits.length}
                 </span>
               </div>
-              <div className="space-y-1">
-                {MOCK_COMMITS.map((commit, index) => (
-                  <CommitItem
-                    key={commit.hash}
-                    commit={commit}
-                    index={index}
-                    isExpanded={expandedCommit === commit.hash}
-                    onToggle={() => setExpandedCommit(expandedCommit === commit.hash ? null : commit.hash)}
-                  />
-                ))}
+              <div className="space-y-1 mt-1">
+                <AnimatePresence initial={false}>
+                  {commits.map((commit) => (
+                    <CommitItem
+                      key={commit.fullHash}
+                      commit={commit}
+                      isExpanded={expandedCommit === commit.fullHash}
+                      onToggle={() => setExpandedCommit(expandedCommit === commit.fullHash ? null : commit.fullHash)}
+                    />
+                  ))}
+                </AnimatePresence>
               </div>
             </motion.div>
           )}
@@ -223,11 +286,22 @@ export const GitPanel: React.FC<GitPanelProps> = ({
 
       {/* Footer Actions */}
       <div className="p-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 space-y-2">
-        <button className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-colors">
+        <button
+          onClick={handleCommitStaged}
+          disabled={hasCommitted}
+          className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+            hasCommitted
+              ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed'
+              : 'bg-violet-600 hover:bg-violet-700 text-white'
+          }`}
+        >
           <TbCheck size={14} />
-          Commit Staged Changes
+          {hasCommitted ? 'Working tree clean' : 'Commit Staged Changes'}
         </button>
-        <button className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm font-medium rounded-lg transition-colors">
+        <button
+          onClick={onViewHistory}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm font-medium rounded-lg transition-colors"
+        >
           <TbClock size={14} />
           View All History
         </button>
@@ -236,30 +310,36 @@ export const GitPanel: React.FC<GitPanelProps> = ({
   );
 };
 
-// Staged Change Item Component
+// Staged Change Item Component — animates out on commit
 interface StagedChangeItemProps {
   commit: GitCommit;
-  index: number;
 }
 
-const StagedChangeItem: React.FC<StagedChangeItemProps> = ({ commit, index }) => {
+const StagedChangeItem: React.FC<StagedChangeItemProps> = ({ commit }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <motion.div
+      layout
+      initial={{ opacity: 0, x: -12 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -24, height: 0, marginTop: 0 }}
+      transition={{ duration: 0.25 }}
+      className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+    >
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors text-left"
       >
         <TbChevronRight
           size={14}
-          className={`text-zinc-400 dark:text-zinc-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+          className={`text-zinc-400 dark:text-zinc-500 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`}
         />
         <TbFile size={16} className="text-green-500 flex-shrink-0" />
         <span className="font-mono text-sm text-zinc-900 dark:text-zinc-100 truncate flex-1">
           {commit.files.join(', ')}
         </span>
-        <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded text-[10px] font-medium">
+        <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded text-[10px] font-medium flex-shrink-0">
           Staged
         </span>
       </button>
@@ -284,34 +364,53 @@ const StagedChangeItem: React.FC<StagedChangeItemProps> = ({ commit, index }) =>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 
 // Commit Item Component
 interface CommitItemProps {
   commit: GitCommit;
-  index: number;
   isExpanded: boolean;
   onToggle: () => void;
 }
 
 const CommitItem: React.FC<CommitItemProps> = ({ commit, isExpanded, onToggle }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyHash = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard?.writeText(commit.fullHash).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+    >
       <button
         onClick={onToggle}
         className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors text-left"
+        aria-expanded={isExpanded}
       >
         <TbChevronRight
           size={14}
-          className={`text-zinc-400 dark:text-zinc-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+          className={`text-zinc-400 dark:text-zinc-500 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`}
         />
         <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
           <TbGitCommit size={14} className="text-zinc-500 dark:text-zinc-400" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm text-zinc-900 dark:text-zinc-100 truncate">{commit.message}</p>
+          <p className={`font-medium text-sm text-zinc-900 dark:text-zinc-100 ${isExpanded ? 'whitespace-normal break-words' : 'truncate'}`}>
+            {commit.message}
+          </p>
           <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
             <span className="font-mono">{commit.hash}</span>
             <span>·</span>
@@ -331,31 +430,69 @@ const CommitItem: React.FC<CommitItemProps> = ({ commit, isExpanded, onToggle })
             exit={{ opacity: 0, height: 0 }}
             className="border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950"
           >
-            <div className="px-3 py-3 space-y-2">
-              <div className="ml-10 space-y-1">
-                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Files changed</p>
+            <div className="px-3 py-3 space-y-3">
+              {/* Full message */}
+              <div className="ml-10">
+                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">
+                  Commit message
+                </p>
+                <p className="text-sm text-zinc-800 dark:text-zinc-200 whitespace-normal break-words leading-relaxed">
+                  {commit.message}
+                </p>
+              </div>
+
+              {/* Full SHA — clickable to copy */}
+              <div className="ml-10">
+                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">
+                  Commit hash
+                </p>
+                <button
+                  onClick={handleCopyHash}
+                  title="Click to copy full hash"
+                  className="group flex items-center gap-2 w-full text-left font-mono text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-800/60 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded px-2 py-1.5 transition-colors"
+                >
+                  <span className="truncate flex-1">{commit.fullHash}</span>
+                  {copied ? (
+                    <TbCheck size={13} className="text-emerald-500 flex-shrink-0" />
+                  ) : (
+                    <TbCopy size={13} className="text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 flex-shrink-0" />
+                  )}
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 flex-shrink-0">
+                    {copied ? 'Copied!' : 'Copy'}
+                  </span>
+                </button>
+              </div>
+
+              {/* Date & Time */}
+              <div className="ml-10 flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400">
+                <TbUser size={11} />
+                <span>{commit.author}</span>
+                <span className="mx-1">·</span>
+                <TbClock size={11} />
+                <span>{commit.date} at {commit.time}</span>
+              </div>
+
+              {/* Files changed */}
+              <div className="ml-10">
+                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">
+                  Files changed ({commit.files.length})
+                </p>
                 <ul className="space-y-0.5">
                   {commit.files.map((file, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
-                      <TbFile size={12} className="text-zinc-400" />
-                      <span className="font-mono">{file}</span>
+                    <li
+                      key={i}
+                      className="flex items-center gap-2 text-xs text-zinc-700 dark:text-zinc-300 font-mono"
+                    >
+                      <TbFile size={12} className="text-zinc-400 flex-shrink-0" />
+                      <span className="break-all">{file}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
-              <div className="ml-10 pt-2 border-t border-zinc-200 dark:border-zinc-800 flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400">
-                <TbUser size={10} />
-                <span>{commit.author}</span>
-                <span className="mx-1">·</span>
-                <TbClock size={10} />
-                <span>{commit.date}</span>
-                <span className="mx-1">·</span>
-                <code className="font-mono bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded">{commit.hash}</code>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };

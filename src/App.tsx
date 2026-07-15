@@ -90,6 +90,7 @@ function App() {
             isOpen={sidebarView === 'source-control'}
             onClose={() => setSidebarView('explorer')}
             onToggleFileExplorer={() => setSidebarView('explorer')}
+            onViewHistory={() => handleTabSelect('git-history.log')}
           />
         )}
 

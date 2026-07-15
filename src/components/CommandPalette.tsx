@@ -165,7 +165,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 <div className="px-4 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-700">
                   {group}
                 </div>
-                {items.map((item, index) => {
+                {items.map((item) => {
                   const globalIndex = filteredItems.indexOf(item);
                   const isSelected = globalIndex === selectedIndex;
                   return (

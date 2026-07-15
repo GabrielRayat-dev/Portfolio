@@ -9,6 +9,7 @@ import { ProjectsListView } from './views/ProjectsListView';
 import { ProjectDetailView } from './views/ProjectDetailView';
 import { SkillsView } from './views/SkillsView';
 import { ContactView } from './views/ContactView';
+import { GitHistoryView } from './views/GitHistoryView';
 import { portfolioData } from '../data/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -41,6 +42,8 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
         return { label: 'skills.json', icon: <TbBraces size={14} className="text-yellow-500" /> };
       case 'contact.txt':
         return { label: 'contact.txt', icon: <TbFile size={14} className="text-zinc-400" /> };
+      case 'git-history.log':
+        return { label: 'git-history.log', icon: <TbFileDescription size={14} className="text-violet-500" /> };
       default:
         return { label: 'file', icon: <TbFile size={14} /> };
     }
@@ -62,6 +65,8 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
         return <SkillsView />;
       case 'contact.txt':
         return <ContactView />;
+      case 'git-history.log':
+        return <GitHistoryView />;
       default:
         return null;
     }
