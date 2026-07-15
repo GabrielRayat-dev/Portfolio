@@ -1,5 +1,5 @@
 import React from 'react';
-import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbSun, TbMoon, TbSearch } from 'react-icons/tb';
+import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbSun, TbMoon, TbSearch, TbMenu } from 'react-icons/tb';
 import type { Theme } from '../hooks/useTheme';
 
 interface TopBarProps {
@@ -8,6 +8,7 @@ interface TopBarProps {
   theme: Theme;
   toggleTheme: () => void;
   onOpenPalette: () => void;
+  onOpenMobileMenu: () => void;
 }
 
 // Detect macOS so we can show ⌘P instead of Ctrl+P
@@ -22,6 +23,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   theme,
   toggleTheme,
   onOpenPalette,
+  onOpenMobileMenu,
 }) => {
   const shortcut = isMac() ? '⌘P' : 'Ctrl+P';
 
@@ -55,8 +57,8 @@ export const TopBar: React.FC<TopBarProps> = ({
         <span className="text-xs truncate">🔍 Search files... ({shortcut})</span>
       </button>
 
-      {/* Right section: Theme toggle */}
-      <div className="flex items-center">
+      {/* Right section: Theme toggle + Mobile menu (tablet/mobile only) */}
+      <div className="flex items-center gap-1">
         <button
           onClick={toggleTheme}
           className="p-1.5 rounded text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800/60 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
@@ -64,6 +66,14 @@ export const TopBar: React.FC<TopBarProps> = ({
           aria-label={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
         >
           {theme === 'dark' ? <TbSun size={18} /> : <TbMoon size={18} />}
+        </button>
+        <button
+          onClick={onOpenMobileMenu}
+          className="md:hidden p-1.5 rounded text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800/60 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+          title="Open menu"
+          aria-label="Open menu"
+        >
+          <TbMenu size={20} />
         </button>
       </div>
     </header>

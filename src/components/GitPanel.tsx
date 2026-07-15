@@ -12,6 +12,8 @@ interface GitPanelProps {
   stagedChanges: GitCommit[];
   hasCommitted: boolean;
   onCommitStaged: () => void;
+  /** Hide the built-in header when embedded (e.g. inside the mobile drawer) */
+  showHeader?: boolean;
 }
 
 export const GitPanel: React.FC<GitPanelProps> = ({
@@ -23,6 +25,7 @@ export const GitPanel: React.FC<GitPanelProps> = ({
   stagedChanges,
   hasCommitted,
   onCommitStaged,
+  showHeader = true,
 }) => {
   const [expandedCommit, setExpandedCommit] = useState<string | null>(null);
   const [showStaged, setShowStaged] = useState(true);
@@ -31,8 +34,11 @@ export const GitPanel: React.FC<GitPanelProps> = ({
   if (!isOpen) return null;
 
   return (
-    <aside className="flex flex-col w-64 h-full border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 animate-slide-in">
+    <aside className={`flex flex-col h-full bg-zinc-50 dark:bg-zinc-950 ${
+      showHeader ? 'w-64 border-r border-zinc-200 dark:border-zinc-800' : 'w-full'
+    } animate-slide-in`}>
       {/* Header */}
+      {showHeader && (
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-900/50">
         <div className="flex items-center gap-2">
           <button
@@ -58,12 +64,13 @@ export const GitPanel: React.FC<GitPanelProps> = ({
           <TbX size={16} className="text-zinc-500 dark:text-zinc-400" />
         </button>
       </div>
+      )}
 
       {/* Toolbar */}
       <div className="px-3 py-2 flex items-center gap-1 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
         <button
           onClick={() => setShowStaged(!showStaged)}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${
+          className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${
             showStaged
               ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300'
               : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800'
@@ -74,7 +81,7 @@ export const GitPanel: React.FC<GitPanelProps> = ({
         </button>
         <button
           onClick={() => setShowHistory(!showHistory)}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${
+          className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded transition-colors ${
             showHistory
               ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300'
               : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800'

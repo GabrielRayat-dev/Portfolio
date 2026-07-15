@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar';
 import { EditorPane } from './components/EditorPane';
 import { StatusBar } from './components/StatusBar';
 import { MobileNav } from './components/MobileNav';
+import { MobileDrawer } from './components/MobileDrawer';
 import { CommandPalette } from './components/CommandPalette';
 import { GitPanel } from './components/GitPanel';
 import { REAL_COMMITS, STAGED_CHANGES, fullFromShort } from './data/gitHistory';
@@ -22,6 +23,9 @@ function App() {
 
   // Command palette state
   const [paletteOpen, setPaletteOpen] = useState(false);
+
+  // Mobile drawer (hamburger menu) state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Shared Git state — drives BOTH the Source Control sidebar and git-history.log
   const [commits, setCommits] = useState<GitCommit[]>(REAL_COMMITS);
@@ -106,6 +110,7 @@ function App() {
         theme={theme}
         toggleTheme={toggleTheme}
         onOpenPalette={() => setPaletteOpen(true)}
+        onOpenMobileMenu={() => setMobileMenuOpen(true)}
       />
 
       {/* Main Workspace (Sidebar + Editor) */}
@@ -154,6 +159,24 @@ function App() {
         isOpen={paletteOpen}
         onClose={() => setPaletteOpen(false)}
         onSelectFile={handleTabSelect}
+      />
+
+      {/* Mobile hamburger drawer (tablet/mobile only) */}
+      <MobileDrawer
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        onOpenPalette={() => {
+          setMobileMenuOpen(false);
+          setPaletteOpen(true);
+        }}
+        commits={commits}
+        stagedChanges={stagedChanges}
+        hasCommitted={hasCommitted}
+        onCommitStaged={handleCommitStaged}
+        onViewHistory={() => {
+          handleTabSelect('git-history.log');
+          setMobileMenuOpen(false);
+        }}
       />
     </div>
   );
