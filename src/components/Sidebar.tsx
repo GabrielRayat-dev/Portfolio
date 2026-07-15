@@ -2,7 +2,7 @@ import React from 'react';
 import {
   TbChevronDown, TbChevronRight, TbFolder, TbFolderOpen,
   TbMarkdown, TbFileDescription, TbBraces, TbFile,
-  TbTerminal, TbBrandReact
+  TbTerminal, TbBrandReact, TbGitBranch
 } from 'react-icons/tb';
 
 interface SidebarProps {
@@ -11,6 +11,7 @@ interface SidebarProps {
   projectsExpanded: boolean;
   setProjectsExpanded: (expanded: boolean) => void;
   sidebarOpen: boolean;
+  onOpenSourceControl: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -19,6 +20,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   projectsExpanded,
   setProjectsExpanded,
   sidebarOpen,
+  onOpenSourceControl,
 }) => {
   if (!sidebarOpen) return null;
 
@@ -40,9 +42,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside className="hidden md:flex w-64 h-full border-r border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-950/70 select-none flex-col shrink-0">
-      {/* Sidebar Header */}
-      <div className="px-4 py-2 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase border-b border-zinc-200 dark:border-zinc-800">
-        Explorer
+      {/* Sidebar Header with Source Control toggle */}
+      <div className="flex items-center justify-between px-4 py-2 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 tracking-wider uppercase border-b border-zinc-200 dark:border-zinc-800">
+        <span>Explorer</span>
+        <button
+          onClick={onOpenSourceControl}
+          className="p-1 rounded text-zinc-400 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+          title="Open Source Control"
+          aria-label="Open Source Control"
+        >
+          <TbGitBranch size={16} />
+        </button>
       </div>
 
       {/* Explorer Accordion */}

@@ -1,18 +1,26 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { TopBar } from './components/TopBar';
 import { Sidebar } from './components/Sidebar';
 import { EditorPane } from './components/EditorPane';
 import { StatusBar } from './components/StatusBar';
 import { MobileNav } from './components/MobileNav';
+import { CommandPalette } from './components/CommandPalette';
+import { GitPanel } from './components/GitPanel';
 
 function App() {
   const { theme, toggleTheme } = useTheme();
-  
+
   // Navigation & Workspace states
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [projectsExpanded, setProjectsExpanded] = useState(true);
-  
+
+  // Sidebar view state: 'explorer' or 'source-control'
+  const [sidebarView, setSidebarView] = useState<'explorer' | 'source-control'>('explorer');
+
+  // Command palette state
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
   // Tab states: default opens about.md
   const [openTabs, setOpenTabs] = useState<string[]>(['about.md']);
   const [activeTabId, setActiveTabId] = useState<string | null>('about.md');
@@ -28,6 +36,18 @@ function App() {
       setSidebarOpen(false);
     }
   }, [openTabs]);
+
+  // Ctrl/Cmd + P — Open command palette
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        setPaletteOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Tab closing logic
   const handleTabClose = (tabIdToClose: string) => {
@@ -51,17 +71,27 @@ function App() {
         setSidebarOpen={setSidebarOpen}
         theme={theme}
         toggleTheme={toggleTheme}
+        onOpenPalette={() => setPaletteOpen(true)}
       />
 
       {/* Main Workspace (Sidebar + Editor) */}
       <div className="flex-1 flex min-h-0 relative">
-        <Sidebar
-          activeTabId={activeTabId}
-          onTabSelect={handleTabSelect}
-          projectsExpanded={projectsExpanded}
-          setProjectsExpanded={setProjectsExpanded}
-          sidebarOpen={sidebarOpen}
-        />
+        {sidebarView === 'explorer' ? (
+          <Sidebar
+            activeTabId={activeTabId}
+            onTabSelect={handleTabSelect}
+            projectsExpanded={projectsExpanded}
+            setProjectsExpanded={setProjectsExpanded}
+            sidebarOpen={sidebarOpen}
+            onOpenSourceControl={() => setSidebarView('source-control')}
+          />
+        ) : (
+          <GitPanel
+            isOpen={sidebarView === 'source-control'}
+            onClose={() => setSidebarView('explorer')}
+            onToggleFileExplorer={() => setSidebarView('explorer')}
+          />
+        )}
 
         <main className="flex-1 h-full min-w-0 bg-white dark:bg-zinc-950 relative pb-20">
           <EditorPane
@@ -78,6 +108,13 @@ function App() {
 
       {/* Mobile bottom navigation — replaces sidebar on small screens */}
       <MobileNav activeTabId={activeTabId} onTabSelect={handleTabSelect} />
+
+      {/* Command Palette (Ctrl/Cmd + P) */}
+      <CommandPalette
+        isOpen={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        onSelectFile={handleTabSelect}
+      />
     </div>
   );
 }

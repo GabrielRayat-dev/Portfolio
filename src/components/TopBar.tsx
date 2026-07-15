@@ -1,5 +1,5 @@
 import React from 'react';
-import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbSun, TbMoon } from 'react-icons/tb';
+import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarLeftExpand, TbSun, TbMoon, TbSearch } from 'react-icons/tb';
 import type { Theme } from '../hooks/useTheme';
 
 interface TopBarProps {
@@ -7,14 +7,24 @@ interface TopBarProps {
   setSidebarOpen: (open: boolean) => void;
   theme: Theme;
   toggleTheme: () => void;
+  onOpenPalette: () => void;
 }
+
+// Detect macOS so we can show ⌘P instead of Ctrl+P
+const isMac = (): boolean => {
+  if (typeof navigator === 'undefined') return false;
+  return /Mac|iPhone|iPad|iPod/.test(navigator.platform) || /Mac/.test(navigator.userAgent);
+};
 
 export const TopBar: React.FC<TopBarProps> = ({
   sidebarOpen,
   setSidebarOpen,
   theme,
   toggleTheme,
+  onOpenPalette,
 }) => {
+  const shortcut = isMac() ? '⌘P' : 'Ctrl+P';
+
   return (
     <header className="h-12 w-full flex items-center justify-between px-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 select-none shrink-0">
       {/* Left section: Sidebar toggle + Workspace title */}
@@ -33,6 +43,17 @@ export const TopBar: React.FC<TopBarProps> = ({
           portfolio — gabriel rayat
         </span>
       </div>
+
+      {/* Center section: VS Code-style search pill */}
+      <button
+        onClick={onOpenPalette}
+        className="group hidden md:flex items-center gap-2 px-3 h-8 min-w-[220px] max-w-[320px] rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 hover:border-violet-400 dark:hover:border-violet-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+        title="Search files"
+        aria-label="Search files"
+      >
+        <TbSearch size={15} className="flex-shrink-0" />
+        <span className="text-xs truncate">🔍 Search files... ({shortcut})</span>
+      </button>
 
       {/* Right section: Theme toggle */}
       <div className="flex items-center">
