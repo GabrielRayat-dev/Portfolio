@@ -63,7 +63,7 @@ function App() {
           sidebarOpen={sidebarOpen}
         />
 
-        <main className="flex-1 h-full min-w-0 bg-white dark:bg-zinc-950 relative pb-20 md:hidden">
+        <main className="flex-1 h-full min-w-0 bg-white dark:bg-zinc-950 relative pb-20">
           <EditorPane
             openTabs={openTabs}
             activeTabId={activeTabId}
