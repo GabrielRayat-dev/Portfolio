@@ -1,0 +1,172 @@
+/* Sandbox Editor Component Styles
+   ----------------------------------------------------------------------
+   CRITICAL: every layer (gutter, textarea, code mirror) MUST share the
+   IDENTICAL font-family, font-size, line-height, and vertical padding so
+   the caret and highlighted text never drift line-by-line.
+   -------------------------------------------------------------------- */
+
+:root {
+  --sandbox-font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --sandbox-font-size: 14px;      /* text-sm */
+  --sandbox-line-height: 1.5rem;  /* leading-6 */
+  --sandbox-pad-y: 12px;
+  --sandbox-pad-x: 12px;
+  --sandbox-gutter-width: 48px;
+}
+
+.sandbox-editor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--sandbox-font);
+  font-size: var(--sandbox-font-size);
+  line-height: var(--sandbox-line-height);
+  background: transparent;
+  tab-size: 4;
+}
+
+/* --- Line-number gutter ------------------------------------------------ */
+.gutter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sandbox-gutter-width);
+  box-sizing: border-box;
+  padding: var(--sandbox-pad-y) 8px var(--sandbox-pad-y) 0;
+  margin: 0;
+  text-align: right;
+  font-family: var(--sandbox-font);
+  font-size: var(--sandbox-font-size);
+  line-height: var(--sandbox-line-height);
+  color: #9a9a9a;
+  background: transparent;
+  border-right: 1px solid rgb(228 228 231 / 0.6); /* zinc-200/60 */
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.dark .gutter {
+  color: #6a6a6a;
+  border-right-color: rgb(39 39 42 / 0.6); /* zinc-800/60 */
+}
+
+.line-number {
+  display: block;
+  height: var(--sandbox-line-height);
+  line-height: var(--sandbox-line-height);
+  white-space: pre;
+}
+
+/* --- Shared layer geometry (textarea + code mirror) ------------------- */
+.textarea,
+.code-block {
+  box-sizing: border-box;
+  margin: 0;
+  font-family: var(--sandbox-font);
+  font-size: var(--sandbox-font-size);
+  line-height: var(--sandbox-line-height);
+  padding: var(--sandbox-pad-y) var(--sandbox-pad-x) var(--sandbox-pad-y)
+    calc(var(--sandbox-gutter-width) + var(--sandbox-pad-x));
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  tab-size: 4;
+}
+
+/* --- Transparent input layer ----------------------------------------- */
+.textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  overflow: auto;
+  color: transparent;
+  caret-color: #2d2d2d;
+}
+
+.dark .textarea {
+  caret-color: #d4d4d4;
+}
+
+/* --- Highlighted mirror layer ---------------------------------------- */
+.code-block {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: #6b7280; /* default gray for plain text */
+  pointer-events: none;
+}
+
+.dark .code-block {
+  color: #6b7280;
+}
+
+.code-block code {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  line-height: inherit;
+  white-space: inherit;
+  /* Default (comment-like) style for plain gibberish/sentences */
+  font-style: italic;
+}
+
+/* Keyword / string / number tokens reset italic + apply theme colors */
+.highlight {
+  font-style: normal;
+  font-weight: inherit; /* never change weight -> no width drift */
+}
+
+.highlight.keyword {
+  color: #c586c0; /* purple-ish keyword */
+  font-weight: 600;
+}
+
+.dark .highlight.keyword {
+  color: #c586c0;
+}
+
+.highlight.string {
+  color: #98c379; /* vibrant green */
+}
+
+.dark .highlight.string {
+  color: #ce9178; /* warm string tone in dark */
+}
+
+.highlight.number {
+  color: #d19a66; /* orange accent (shared with booleans) */
+}
+
+.dark .highlight.number {
+  color: #b5cea8; /* light green accent in dark (shared with booleans) */
+}
+
+.highlight.function {
+  color: #569cd6; /* beautiful light blue for call/function names */
+}
+
+.dark .highlight.function {
+  color: #9cdcfe; /* brighter blue in dark */
+}
+
+.highlight.bracket {
+  color: #e5c07b; /* bright golden-yellow for (), {}, [] */
+}
+
+.dark .highlight.bracket {
+  color: #e5c07b; /* same golden-yellow in dark */
+}

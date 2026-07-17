@@ -4,6 +4,7 @@ import {
   TbMarkdown, TbFileDescription, TbBraces, TbFile,
   TbTerminal, TbBrandReact, TbGitBranch
 } from 'react-icons/tb';
+import { TbCode } from 'react-icons/tb';
 
 interface SidebarProps {
   activeTabId: string | null;
@@ -12,6 +13,8 @@ interface SidebarProps {
   setProjectsExpanded: (expanded: boolean) => void;
   sidebarOpen: boolean;
   onOpenSourceControl: () => void;
+  playgroundExpanded: boolean;
+  setPlaygroundExpanded: (expanded: boolean) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -21,6 +24,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setProjectsExpanded,
   sidebarOpen,
   onOpenSourceControl,
+  playgroundExpanded,
+  setPlaygroundExpanded,
 }) => {
   if (!sidebarOpen) return null;
 
@@ -34,6 +39,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       children: [
         { id: 'project-one', label: 'progresso.tsx', icon: <TbBrandReact size={16} className="text-cyan-500" /> },
         { id: 'project-two', label: 'stellars-dental.ts', icon: <TbTerminal size={16} className="text-emerald-500" /> },
+      ]
+    },
+    {
+      id: 'playground',
+      label: 'playground',
+      isFolder: true,
+      children: [
+        { id: 'sandbox.js', label: 'sandbox.js', icon: <TbCode size={16} className="text-yellow-500" /> },
       ]
     },
     { id: 'skills.json', label: 'skills.json', icon: <TbBraces size={16} className="text-yellow-500" /> },
@@ -63,26 +76,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Tree Root */}
-        <div className="mt-1 font-mono text-xs text-zinc-600 dark:text-zinc-400 space-y-[2px]">
+        <div className="mt-1 font-mono text-xs text-zinc-600 dark:text-zinc-400 space-y-0.5">
           {fileItems.map((item) => {
             if (item.isFolder) {
               return (
-                <div key={item.id} className="space-y-[2px]">
+                <div key={item.id} className="space-y-0.5">
                   {/* Folder Item */}
                   <div
                     onClick={() => {
-                      setProjectsExpanded(!projectsExpanded);
-                      onTabSelect('projects'); // Clicking the projects folder also opens the card overview
+                      if (item.id === 'projects') {
+                        setProjectsExpanded(!projectsExpanded);
+                        onTabSelect('projects'); // Clicking the projects folder also opens the card overview
+                      } else if (item.id === 'playground') {
+                        setPlaygroundExpanded(!playgroundExpanded);
+                        // No tab select for playground folder; only expand/collapse
+                      }
                     }}
                     className={`flex items-center px-4 py-1.5 cursor-pointer hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors ${
-                      activeTabId === 'projects' ? 'bg-zinc-200 dark:bg-zinc-800/70 text-violet-600 dark:text-violet-400 font-semibold' : ''
+                      (item.id === 'projects' && activeTabId === 'projects') ||
+                      (item.id === 'playground' && activeTabId === 'playground')
+                        ? 'bg-zinc-200 dark:bg-zinc-800/70 text-violet-600 dark:text-violet-400 font-semibold'
+                        : ''
                     }`}
                   >
                     <span className="mr-1">
-                      {projectsExpanded ? <TbChevronDown size={14} /> : <TbChevronRight size={14} />}
+                      {(item.id === 'projects' ? projectsExpanded : playgroundExpanded) ? (
+                        <TbChevronDown size={14} />
+                      ) : (
+                        <TbChevronRight size={14} />
+                      )}
                     </span>
                     <span className="mr-2">
-                      {projectsExpanded ? (
+                      {(item.id === 'projects' ? projectsExpanded : playgroundExpanded) ? (
                         <TbFolderOpen size={16} className="text-violet-600 dark:text-violet-400" />
                       ) : (
                         <TbFolder size={16} className="text-violet-600 dark:text-violet-400" />
@@ -92,8 +117,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
 
                   {/* Folder Children (Expandable) */}
-                  {projectsExpanded && (
-                    <div className="pl-6 space-y-[2px] border-l border-zinc-200/60 dark:border-zinc-800/60 ml-6">
+                  {(item.id === 'projects' ? projectsExpanded : playgroundExpanded) && (
+                    <div className="pl-6 space-y-0.5 border-l border-zinc-200/60 dark:border-zinc-800/60 ml-6">
                       {item.children?.map((child) => (
                         <div
                           key={child.id}

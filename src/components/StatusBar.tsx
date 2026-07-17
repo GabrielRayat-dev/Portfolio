@@ -68,6 +68,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({ activeTabId }) => {
     if (activeTabId.endsWith('.json')) return 'JSON';
     if (activeTabId.endsWith('.txt')) return 'Plain Text';
     if (activeTabId === 'projects') return 'Directory Overview';
+    if (activeTabId === 'sandbox.js') return 'JavaScript';
     return 'Plain Text';
   };
 

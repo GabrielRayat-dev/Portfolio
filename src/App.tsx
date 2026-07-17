@@ -17,6 +17,7 @@ function App() {
   // Navigation & Workspace states
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [projectsExpanded, setProjectsExpanded] = useState(true);
+  const [playgroundExpanded, setPlaygroundExpanded] = useState(true);
 
   // Sidebar view state: 'explorer' or 'source-control'
   const [sidebarView, setSidebarView] = useState<'explorer' | 'source-control'>('explorer');
@@ -121,6 +122,8 @@ function App() {
             onTabSelect={handleTabSelect}
             projectsExpanded={projectsExpanded}
             setProjectsExpanded={setProjectsExpanded}
+            playgroundExpanded={playgroundExpanded}
+            setPlaygroundExpanded={setPlaygroundExpanded}
             sidebarOpen={sidebarOpen}
             onOpenSourceControl={() => setSidebarView('source-control')}
           />

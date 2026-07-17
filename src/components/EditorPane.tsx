@@ -10,6 +10,7 @@ import { ProjectDetailView } from './views/ProjectDetailView';
 import { SkillsView } from './views/SkillsView';
 import { ContactView } from './views/ContactView';
 import { GitHistoryView } from './views/GitHistoryView';
+import { SandboxView } from './views/SandboxView';
 import type { GitCommit } from '../data/gitHistory';
 import { portfolioData } from '../data/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -47,6 +48,8 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
         return { label: 'contact.txt', icon: <TbFile size={14} className="text-zinc-400" /> };
       case 'git-history.log':
         return { label: 'git-history.log', icon: <TbFileDescription size={14} className="text-violet-500" /> };
+      case 'sandbox.js':
+        return { label: 'sandbox.js', icon: <TbCode size={14} className="text-yellow-500" /> };
       default:
         return { label: 'file', icon: <TbFile size={14} /> };
     }
@@ -70,6 +73,8 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
         return <ContactView />;
       case 'git-history.log':
         return <GitHistoryView commits={gitCommits} />;
+      case 'sandbox.js':
+        return <SandboxView />;
       default:
         return null;
     }
